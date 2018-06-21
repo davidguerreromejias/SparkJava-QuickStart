@@ -6,6 +6,8 @@ import java.nio.file.Paths;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -31,14 +33,17 @@ public class Main
         for (String fileName : fileSet) {
             Dataset<String> tempDataset = spark.read().textFile(fileName).cache();
             numAs += tempDataset.filter(s -> s.contains("ESP")).count();
-            numBs += tempDataset.filter(s -> s.contains("b")).count();
+            numBs += tempDataset.filter(s -> s.contains("b")).count(); 
         }
         
-        Dataset<String> logData = spark.read().textFile(logFile).cache();
+        //Dataset<String> logData = spark.read().textFile(logFile).cache();
+        
+        JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+        JavaRDD<String> rows = sc.textFile("C:\\Users\\Lenovo\\Documents\\fifa-world-cup\\WorldCupMatches.csv");
+        JavaRDD<String> spainMatches = rows.filter(s -> s.contains("Spain"));
+        System.out.println(rows.first());
 
-
-
-        System.out.println("Lines with a: " + numAs + ", lines with b: " + numBs);
+        System.out.println("Lines with ESP: " + numAs + ", lines with b: " + numBs);
 
         spark.stop();
     }
