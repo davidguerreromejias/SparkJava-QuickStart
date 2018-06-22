@@ -11,6 +11,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import static org.apache.spark.sql.functions.col;
 
 /**
  * Spark quick start with java
@@ -28,7 +29,7 @@ public class Main
                 .map(name -> name.toString())
                 .collect(Collectors.toSet());
         
-        long numAs = 0;
+        /*long numAs = 0;
         long numBs = 0;
         for (String fileName : fileSet) {
             Dataset<String> tempDataset = spark.read().textFile(fileName).cache();
@@ -36,14 +37,38 @@ public class Main
             numBs += tempDataset.filter(s -> s.contains("b")).count(); 
         }
         
-        //Dataset<String> logData = spark.read().textFile(logFile).cache();
+        //Dataset<String> logData = spark.read().textFile(logFile).cache();*/
+        // DATASET
+        Dataset<Row> df = spark.read().csv("C:\\Users\\Lenovo\\Documents\\fifa-world-cup\\WorldCupMatches.csv");
+        //df.show();
+        //df.select("_c5", "_c6", "_c7", "_c8").show();
+        //df.select("_c3").contains("Spain");
         
-        JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+        
+        //Spark sql
+        df.createOrReplaceTempView("matches");
+        
+        Dataset<Row> sqlDF = spark.sql("SELECT _c5, _c6, _c7, _c8 from matches where _c5 = 'Spain' or _c8 = 'Spain'");
+        Dataset<Row> homeMatchesSpain = spark.sql("SELECT * from matches where _c5 = 'Spain'");
+        //homeMatchesSpain.show();
+        Dataset<Row> awayMatchesSpain = spark.sql("SELECT * from matches where _c8 = 'Spain'");
+        sqlDF.createOrReplaceTempView("spainMatches");
+        homeMatchesSpain.createOrReplaceTempView("homeSpainMatches");
+        awayMatchesSpain.createOrReplaceTempView("awaySpainMatches");
+        Dataset<Row> winsHome = spark.sql("SELECT * FROM homeSpainMatches  WHERE _c5 = 'Spain' and _c6 > _c7");
+        Dataset<Row> winsAway = spark.sql("SELECT * FROM awaySpainMatches  WHERE _c8 = 'Spain' and _c7 > _c6");
+        long totalWins = winsHome.count();
+        totalWins += winsAway.count();
+        
+        System.out.println("Spain has won " + totalWins + " matches of all that has played in the World Cups.");
+        
+        //RDD
+        /*JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
         JavaRDD<String> rows = sc.textFile("C:\\Users\\Lenovo\\Documents\\fifa-world-cup\\WorldCupMatches.csv");
         JavaRDD<String> spainMatches = rows.filter(s -> s.contains("Spain"));
         System.out.println(rows.first());
 
-        System.out.println("Lines with ESP: " + numAs + ", lines with b: " + numBs);
+        System.out.println("Lines with ESP: " + numAs + ", lines with b: " + numBs);*/
 
         spark.stop();
     }
