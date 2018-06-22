@@ -48,6 +48,7 @@ public class Main
         //Spark sql
         df.createOrReplaceTempView("matches");
         
+        //WINS
         Dataset<Row> sqlDF = spark.sql("SELECT _c5, _c6, _c7, _c8 from matches where _c5 = 'Spain' or _c8 = 'Spain'");
         Dataset<Row> homeMatchesSpain = spark.sql("SELECT * from matches where _c5 = 'Spain'");
         //homeMatchesSpain.show();
@@ -60,7 +61,21 @@ public class Main
         long totalWins = winsHome.count();
         totalWins += winsAway.count();
         
-        System.out.println("Spain has won " + totalWins + " matches of all that has played in the World Cups.");
+        //LOSSES
+        Dataset<Row> lossesHome = spark.sql("SELECT * FROM homeSpainMatches  WHERE _c5 = 'Spain' and _c6 < _c7");
+        Dataset<Row> lossesAway = spark.sql("SELECT * FROM awaySpainMatches  WHERE _c8 = 'Spain' and _c7 < _c6");
+        long totalLosses = lossesHome.count();
+        totalLosses += lossesAway.count();
+        
+        //DRAWS
+        Dataset<Row> drawsHome = spark.sql("SELECT * FROM homeSpainMatches  WHERE _c5 = 'Spain' and _c6 = _c7");
+        Dataset<Row> drawsAway = spark.sql("SELECT * FROM awaySpainMatches  WHERE _c8 = 'Spain' and _c7 = _c6");
+        long totalDraws = drawsHome.count();
+        totalDraws += drawsAway.count();
+        
+        System.out.println("Spain has win " + totalWins+ " matches of all that has played in the World Cups.");
+        System.out.println("Spain has lose " + totalLosses + " matches of all that has played in the World Cups.");
+        System.out.println("Spain has draw " + totalDraws + " matches of all that has played in the World Cups.");
         
         //RDD
         /*JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
