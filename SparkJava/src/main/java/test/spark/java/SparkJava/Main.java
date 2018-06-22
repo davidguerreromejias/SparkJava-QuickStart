@@ -77,6 +77,7 @@ public class Main
         System.out.println("Spain has lose " + totalLosses + " matches of all that has played in the World Cups.");
         System.out.println("Spain has draw " + totalDraws + " matches of all that has played in the World Cups.");
         
+        
         //RDD
         /*JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
         JavaRDD<String> rows = sc.textFile("C:\\Users\\Lenovo\\Documents\\fifa-world-cup\\WorldCupMatches.csv");
