@@ -101,7 +101,13 @@ public class Main
         System.out.println(rows.first());
 
         System.out.println("Lines with ESP: " + numAs + ", lines with b: " + numBs);*/
-
+        
+        //SAVE TO PARQUET FILE
+//        System.out.println(df.head());
+//        df.select("_c3").write().save("C:\\Users\\Lenovo\\Documents\\fifa-world-cup\\WorldCupMatches.parquet");
+//        System.out.println("Guardado el archivo en formato parquet");
+        
+        //STOP SPARK
         spark.stop();
     }
 
