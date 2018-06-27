@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.avro.Schema;
+import org.apache.parquet.avro.AvroParquetWriter;
+import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.sql.Dataset;
@@ -30,7 +33,10 @@ public class Main
     public static void main( String[] args ) throws IOException
     {
     	String logFile = "C:\\Users\\Lenovo\\Documents\\RandomText.txt";
-        SparkSession spark = SparkSession.builder().master("local").appName("Count number of lines with x letter").getOrCreate();
+        SparkSession spark = SparkSession.builder()
+        		.master("local")
+        		.appName("Count number of lines with x letter")
+        		.getOrCreate();
         
         Set<String> fileSet = Files.list(Paths.get("C:\\Users\\Lenovo\\Documents\\fifa-world-cup"))
                 .filter(name -> name.toString().endsWith(".csv"))
@@ -103,9 +109,10 @@ public class Main
         System.out.println("Lines with ESP: " + numAs + ", lines with b: " + numBs);*/
         
         //SAVE TO PARQUET FILE
-//        System.out.println(df.head());
-//        df.select("_c3").write().save("C:\\Users\\Lenovo\\Documents\\fifa-world-cup\\WorldCupMatches.parquet");
-//        System.out.println("Guardado el archivo en formato parquet");
+        df.printSchema();
+        System.setProperty("hadoop.home.dir","C:\\hadoop" );
+        df.write().parquet("C:\\Users\\Lenovo\\Documents\\fifa-world-cup\\permisos2.parquet");
+        System.out.println("Guardado el archivo en formato parquet");
         
         //STOP SPARK
         spark.stop();
